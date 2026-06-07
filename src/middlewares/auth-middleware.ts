@@ -20,7 +20,7 @@ export const authMiddleware = new Elysia()
   })
   .onError({ as: 'scoped' }, ({ error, set }) => {
     // Penanganan error terpusat untuk masalah autentikasi
-    if (error.message === "token tidak valid") {
+    if (error instanceof Error && error.message === "token tidak valid") {
       set.status = 401;
       return { message: "token tidak valid" };
     }

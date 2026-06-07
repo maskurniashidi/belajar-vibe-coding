@@ -27,7 +27,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(200);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json).toEqual({ data: "OK" });
 
       // Verifikasi data tersimpan di database
@@ -38,6 +38,9 @@ describe("User API Integration Tests", () => {
         .limit(1);
       
       expect(dbUser).toBeDefined();
+      if (!dbUser) {
+        throw new Error("dbUser is undefined");
+      }
       expect(dbUser.name).toBe("Test User");
       expect(dbUser.email).toBe("test@example.com");
       // Password harus ter-hash
@@ -72,7 +75,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(400);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json).toEqual({ message: "email sudah terdaftar" });
     });
 
@@ -154,7 +157,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(200);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json.token).toBeDefined();
       expect(typeof json.token).toBe("string");
 
@@ -181,7 +184,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(400);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json).toEqual({ message: "email atau password salah" });
     });
 
@@ -198,7 +201,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(400);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json).toEqual({ message: "email atau password salah" });
     });
 
@@ -245,7 +248,7 @@ describe("User API Integration Tests", () => {
           }),
         })
       );
-      const json = await response.json();
+      const json = await response.json() as any;
       validToken = json.token;
     });
 
@@ -260,7 +263,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(200);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json.data).toBeDefined();
       expect(json.data.name).toBe("Profile User");
       expect(json.data.email).toBe("profile@example.com");
@@ -278,7 +281,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(401);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json).toEqual({ message: "token tidak valid" });
     });
 
@@ -290,7 +293,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(401);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json).toEqual({ message: "token tidak valid" });
     });
   });
@@ -323,7 +326,7 @@ describe("User API Integration Tests", () => {
           }),
         })
       );
-      const json = await response.json();
+      const json = await response.json() as any;
       validToken = json.token;
     });
 
@@ -338,7 +341,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(200);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json).toEqual({ message: "Logout berhasil" });
 
       // Bonus: Uji coba memanggil API Get Current User menggunakan token yang baru saja dilogout
@@ -351,7 +354,7 @@ describe("User API Integration Tests", () => {
         })
       );
       expect(profileResponse.status).toBe(401);
-      const profileJson = await profileResponse.json();
+      const profileJson = await profileResponse.json() as any;
       expect(profileJson).toEqual({ message: "token tidak valid" });
     });
 
@@ -366,7 +369,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(401);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json).toEqual({ message: "token tidak valid" });
     });
 
@@ -378,7 +381,7 @@ describe("User API Integration Tests", () => {
       );
 
       expect(response.status).toBe(401);
-      const json = await response.json();
+      const json = await response.json() as any;
       expect(json).toEqual({ message: "token tidak valid" });
     });
   });

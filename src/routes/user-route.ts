@@ -9,9 +9,14 @@ export const userRoutes = new Elysia({ prefix: "/api" })
       const result = await UserService.registerUser(body);
       return { data: result };
     } catch (error: any) {
-      if (error.message === "email sudah terdaftar") {
+      if (
+        error.message === "email sudah terdaftar" ||
+        (error.message && error.message.includes("Duplicate entry")) ||
+        (error.cause && error.cause.message && error.cause.message.includes("Duplicate entry")) ||
+        (error.cause && error.cause.code === "ER_DUP_ENTRY")
+      ) {
         set.status = 400;
-        return { message: error.message };
+        return { message: "email sudah terdaftar" };
       }
       set.status = 500;
       return { message: "Internal server error" };
@@ -19,8 +24,8 @@ export const userRoutes = new Elysia({ prefix: "/api" })
   }, {
     body: t.Object({
       name: t.String({ minLength: 1, maxLength: 255 }),
-      email: t.String(),
-      password: t.String({ minLength: 6 }),
+      email: t.String({ format: 'email', maxLength: 255 }),
+      password: t.String({ minLength: 6, maxLength: 255 }),
     })
   })
   .post("/users/login", async ({ body, set }) => {
@@ -37,8 +42,8 @@ export const userRoutes = new Elysia({ prefix: "/api" })
     }
   }, {
     body: t.Object({
-      email: t.String(),
-      password: t.String({ minLength: 6 }),
+      email: t.String({ format: 'email', maxLength: 255 }),
+      password: t.String({ minLength: 6, maxLength: 255 }),
     })
   })
   .use(authMiddleware)

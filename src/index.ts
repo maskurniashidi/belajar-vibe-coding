@@ -3,7 +3,7 @@ import { db } from "./db";
 import { users } from "./db/schema";
 import { userRoutes } from "./routes/user-route";
 
-const app = new Elysia()
+export const app = new Elysia()
   .get("/", () => ({ status: "ok", message: "Server is running" }))
   .use(userRoutes)
   .get("/users", async () => {
@@ -18,10 +18,12 @@ const app = new Elysia()
     } catch (error: any) {
       return { success: false, error: error.message };
     }
-  })
-  .listen(3000);
+  });
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+if (import.meta.main) {
+  app.listen(3000);
+  console.log(
+    `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
+  );
+}
 

@@ -59,6 +59,27 @@ export const userRoutes = new Elysia({ prefix: "/api" })
       set.status = 500;
       return { message: "Internal server error" };
     }
+  })
+  .delete("/users/logout", async ({ headers, set }) => {
+    const authHeader = headers["authorization"];
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      set.status = 401;
+      return { message: "token tidak valid" };
+    }
+
+    const token = authHeader.substring(7);
+
+    try {
+      await UserService.logoutUser(token);
+      return { message: "Logout berhasil" };
+    } catch (error: any) {
+      if (error.message === "token tidak valid") {
+        set.status = 401;
+        return { message: "token tidak valid" };
+      }
+      set.status = 500;
+      return { message: "Internal server error" };
+    }
   });
 
 

@@ -1,5 +1,7 @@
 import { Elysia, t } from "elysia";
 import { UserService } from "../services/user-service";
+import { authMiddleware } from "../middlewares/auth-middleware";
+
 
 export const userRoutes = new Elysia({ prefix: "/api" })
   .post("/users", async ({ body, set }) => {
@@ -39,47 +41,13 @@ export const userRoutes = new Elysia({ prefix: "/api" })
       password: t.String({ minLength: 6 }),
     })
   })
-  .get("/users", async ({ headers, set }) => {
-    const authHeader = headers["authorization"];
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      set.status = 401;
-      return { message: "token tidak valid" };
-    }
-
-    const token = authHeader.substring(7);
-
-    try {
-      const user = await UserService.getCurrentUser(token);
-      return { data: user };
-    } catch (error: any) {
-      if (error.message === "token tidak valid") {
-        set.status = 401;
-        return { message: "token tidak valid" };
-      }
-      set.status = 500;
-      return { message: "Internal server error" };
-    }
+  .use(authMiddleware)
+  .get("/users", ({ user }) => {
+    return { data: user };
   })
-  .delete("/users/logout", async ({ headers, set }) => {
-    const authHeader = headers["authorization"];
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      set.status = 401;
-      return { message: "token tidak valid" };
-    }
-
-    const token = authHeader.substring(7);
-
-    try {
-      await UserService.logoutUser(token);
-      return { message: "Logout berhasil" };
-    } catch (error: any) {
-      if (error.message === "token tidak valid") {
-        set.status = 401;
-        return { message: "token tidak valid" };
-      }
-      set.status = 500;
-      return { message: "Internal server error" };
-    }
+  .delete("/users/logout", async ({ token }) => {
+    await UserService.logoutUser(token);
+    return { message: "Logout berhasil" };
   });
 
 
